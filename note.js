@@ -1,5 +1,6 @@
 import { getDatabase, ref, set, onValue, push, query, orderByChild, equalTo, get, remove, update }
     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
+import "./index.js"
 
 const database = getDatabase();
 
@@ -143,7 +144,7 @@ async function saveNoteEdit(notebookId, noteId, oldTitle, oldContent) {
     // Update version history
     const noteSnapshot = await get(noteRef);
     const note = noteSnapshot.val();
-    const versionHistory = note.versionHistory || [];
+    const versionHistory = note?.versionHistory || [];
     versionHistory.push({ title: oldTitle, content: oldContent, timestamp: new Date().toISOString() });
 
     try {

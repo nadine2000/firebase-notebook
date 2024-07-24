@@ -1,5 +1,5 @@
 import {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword, showToast} from "./index.js"
-  
+
 const Login = (event) => {
       
     event.preventDefault();

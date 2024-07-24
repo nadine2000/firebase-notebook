@@ -202,46 +202,6 @@ function displayNoteHistory(notebookId, noteId) {
             });
         });
     });
-
-    // const historyContainer = document.getElementById('historyContainer');
-    // historyContainer.innerHTML = ''; // Clear current history
-    //
-    // const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
-    // onValue(noteRef, (snapshot) => {
-    //     const note = snapshot.val();
-    //     let versionHistory = note?.versionHistory || [];
-    //
-    //     // Filter out duplicate versions
-    //     const uniqueVersions = versionHistory.filter((version, index, self) =>
-    //             index === self.findIndex((v) => (
-    //                 v.title === version.title && v.content === version.content
-    //             ))
-    //     );
-    //
-    //     console.log(uniqueVersions)
-    //
-    //     uniqueVersions.forEach((version, index) => {
-    //         const historyCard = document.createElement('div');
-    //         historyCard.className = 'card history-card';
-    //         historyCard.innerHTML = `
-    //     <div class="card-body">
-    //       <h5 class="card-title">Version ${index + 1}</h5>
-    //       <p class="card-text">Title: ${version.title}</p>
-    //       <p class="card-text">Content: ${version.content}</p>
-    //       <p class="card-text">Timestamp: ${new Date(version.timestamp).toLocaleString()}</p>
-    //       <button class="btn btn-secondary revert-note-btn" data-id="${noteId}" data-index="${index}">Revert</button>
-    //     </div>
-    //   `;
-    //         historyContainer.appendChild(historyCard);
-    //
-    //         // Add event listener for revert button
-    //         historyCard.querySelector('.revert-note-btn').addEventListener('click', () => {
-    //             const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
-    //             historyModal?.hide();
-    //             revertNoteVersion(notebookId, noteId, version.title, version.content);
-    //         });
-    //     });
-    // });
 }
 
 

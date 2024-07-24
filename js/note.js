@@ -83,7 +83,7 @@ function displayNotes(notebookId) {
                 <p class="card-text">${note.content}</p>
                 <button class="btn btn-primary edit-note-btn" data-id="${childSnapshot.key}">Edit</button>
                 <button class="btn btn-danger delete-note-btn" data-id="${childSnapshot.key}">Delete</button>
-                <button class="btn btn-info history-note-btn" data-id="${childSnapshot.key}">History</button>
+                <button class="btn btn-info history-note-btn" data-bs-toggle="modal" data-bs-target="#historyModal" data-id="${childSnapshot.key}">History</button>
               </div> </div>
             `;
             notesContainer.appendChild(noteCard);
@@ -162,21 +162,24 @@ async function saveNoteEdit(notebookId, noteId, oldTitle, oldContent) {
 }
 
 function displayNoteHistory(notebookId, noteId) {
+
     const historyContainer = document.getElementById('historyContainer');
     historyContainer.innerHTML = ''; // Clear current history
 
     const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
     onValue(noteRef, (snapshot) => {
         const note = snapshot.val();
-        let versionHistory = note?.versionHistory || [];
+        const versionHistory = note?.versionHistory || [];
 
         // Filter out duplicate versions
         const uniqueVersions = versionHistory.filter((version, index, self) =>
                 index === self.findIndex((v) => (
-                    v.title === version.title && v.content === version.content
+                    v.title === version.title && v.content === version.content && v.timestamp === version.timestamp
                 ))
         );
-console.log(uniqueVersions)
+
+        historyContainer.innerHTML = '';
+
         uniqueVersions.forEach((version, index) => {
             const historyCard = document.createElement('div');
             historyCard.className = 'card history-card';
@@ -193,14 +196,52 @@ console.log(uniqueVersions)
 
             // Add event listener for revert button
             historyCard.querySelector('.revert-note-btn').addEventListener('click', () => {
+                const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+                historyModal.hide();
                 revertNoteVersion(notebookId, noteId, version.title, version.content);
             });
         });
     });
 
-    // Show the history modal
-    const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
-    historyModal.show();
+    // const historyContainer = document.getElementById('historyContainer');
+    // historyContainer.innerHTML = ''; // Clear current history
+    //
+    // const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
+    // onValue(noteRef, (snapshot) => {
+    //     const note = snapshot.val();
+    //     let versionHistory = note?.versionHistory || [];
+    //
+    //     // Filter out duplicate versions
+    //     const uniqueVersions = versionHistory.filter((version, index, self) =>
+    //             index === self.findIndex((v) => (
+    //                 v.title === version.title && v.content === version.content
+    //             ))
+    //     );
+    //
+    //     console.log(uniqueVersions)
+    //
+    //     uniqueVersions.forEach((version, index) => {
+    //         const historyCard = document.createElement('div');
+    //         historyCard.className = 'card history-card';
+    //         historyCard.innerHTML = `
+    //     <div class="card-body">
+    //       <h5 class="card-title">Version ${index + 1}</h5>
+    //       <p class="card-text">Title: ${version.title}</p>
+    //       <p class="card-text">Content: ${version.content}</p>
+    //       <p class="card-text">Timestamp: ${new Date(version.timestamp).toLocaleString()}</p>
+    //       <button class="btn btn-secondary revert-note-btn" data-id="${noteId}" data-index="${index}">Revert</button>
+    //     </div>
+    //   `;
+    //         historyContainer.appendChild(historyCard);
+    //
+    //         // Add event listener for revert button
+    //         historyCard.querySelector('.revert-note-btn').addEventListener('click', () => {
+    //             const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+    //             historyModal?.hide();
+    //             revertNoteVersion(notebookId, noteId, version.title, version.content);
+    //         });
+    //     });
+    // });
 }
 
 
@@ -239,10 +280,6 @@ async function revertNoteVersion(notebookId, noteId, title, content) {
         });
 
         displayNotes(notebookId); // Update the displayed notes
-
-        const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
-        if (historyModal)
-        historyModal.hide();
 
     } catch (error) {
         console.error('Error reverting note version:', error);

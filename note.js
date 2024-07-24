@@ -168,7 +168,7 @@ function displayNoteHistory(notebookId, noteId) {
     const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
     onValue(noteRef, (snapshot) => {
         const note = snapshot.val();
-        const versionHistory = note.versionHistory || [];
+        const versionHistory = note?.versionHistory || [];
 
         versionHistory.forEach((version, index) => {
             const historyCard = document.createElement('div');

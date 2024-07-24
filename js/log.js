@@ -1,4 +1,10 @@
-import {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword, showToast} from "./index.js"
+import {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword} from "./index.js"
+
+const showToast = (message) => {
+    document.querySelector('#liveToast .toast-body').innerText = message;
+    const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+    toast.show();
+}
 
 const Login = (event) => {
       

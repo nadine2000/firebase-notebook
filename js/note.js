@@ -142,12 +142,14 @@ async function saveNoteEdit(notebookId, noteId, oldTitle, oldContent) {
     const newContent = document.getElementById(`editContent-${noteId}`).value;
     const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
     // Update version history
-    const noteSnapshot = await get(noteRef);
-    const note = noteSnapshot.val();
-    const versionHistory = note?.versionHistory || [];
-    versionHistory.push({ title: oldTitle, content: oldContent, timestamp: new Date().toISOString() });
 
     try {
+
+        const noteSnapshot = await get(noteRef);
+        const note = noteSnapshot.val();
+        const versionHistory = note?.versionHistory || [];
+        versionHistory.push({ title: oldTitle, content: oldContent, timestamp: new Date().toISOString() });
+
         await update(noteRef, {
             title: newTitle,
             content: newContent,
@@ -159,8 +161,6 @@ async function saveNoteEdit(notebookId, noteId, oldTitle, oldContent) {
     }
 }
 
-
-// Function to display the version history of a note
 function displayNoteHistory(notebookId, noteId) {
     const historyContainer = document.getElementById('historyContainer');
     historyContainer.innerHTML = ''; // Clear current history
@@ -168,20 +168,27 @@ function displayNoteHistory(notebookId, noteId) {
     const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
     onValue(noteRef, (snapshot) => {
         const note = snapshot.val();
-        const versionHistory = note?.versionHistory || [];
+        let versionHistory = note?.versionHistory || [];
 
-        versionHistory.forEach((version, index) => {
+        // Filter out duplicate versions
+        const uniqueVersions = versionHistory.filter((version, index, self) =>
+                index === self.findIndex((v) => (
+                    v.title === version.title && v.content === version.content
+                ))
+        );
+console.log(uniqueVersions)
+        uniqueVersions.forEach((version, index) => {
             const historyCard = document.createElement('div');
             historyCard.className = 'card history-card';
             historyCard.innerHTML = `
-              <div class="card-body">
-                <h5 class="card-title">Version ${index + 1}</h5>
-                <p class="card-text">Title: ${version.title}</p>
-                <p class="card-text">Content: ${version.content}</p>
-                <p class="card-text">Timestamp: ${new Date(version.timestamp).toLocaleString()}</p>
-                <button class="btn btn-secondary revert-note-btn" data-id="${noteId}" data-index="${index}">Revert</button>
-              </div>
-            `;
+        <div class="card-body">
+          <h5 class="card-title">Version ${index + 1}</h5>
+          <p class="card-text">Title: ${version.title}</p>
+          <p class="card-text">Content: ${version.content}</p>
+          <p class="card-text">Timestamp: ${new Date(version.timestamp).toLocaleString()}</p>
+          <button class="btn btn-secondary revert-note-btn" data-id="${noteId}" data-index="${index}">Revert</button>
+        </div>
+      `;
             historyContainer.appendChild(historyCard);
 
             // Add event listener for revert button
@@ -196,14 +203,47 @@ function displayNoteHistory(notebookId, noteId) {
     historyModal.show();
 }
 
+
 // Function to revert to a previous version of a note
 async function revertNoteVersion(notebookId, noteId, title, content) {
+
     const noteRef = ref(database, `notebooks/${notebookId}/notes/${noteId}`);
+
     try {
-        await update(noteRef, { title: title, content: content });
+        const noteSnapshot = await get(noteRef);
+        const note = noteSnapshot.val();
+
+        // Ensure versionHistory exists
+        const versionHistory = note?.versionHistory || [];
+        const currentNoteVersion = {
+            title: note.title,
+            content: note.content,
+            timestamp: new Date().toISOString()
+        };
+
+        // Check if the current version is already in the history
+        const isAlreadyInHistory = versionHistory.some(version =>
+            version.title === currentNoteVersion.title &&
+            version.content === currentNoteVersion.content
+        );
+
+        // Add the current version to the history if it's not already there
+        if (!isAlreadyInHistory) {
+            versionHistory.push(currentNoteVersion);
+        }
+
+        await update(noteRef, {
+            title: title,
+            content: content,
+            versionHistory: versionHistory
+        });
+
         displayNotes(notebookId); // Update the displayed notes
+
         const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+        if (historyModal)
         historyModal.hide();
+
     } catch (error) {
         console.error('Error reverting note version:', error);
     }
@@ -251,7 +291,6 @@ function displayNotebooks(snapshot) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
     document.getElementById('toggleBtn').addEventListener('click', toggle);
     document.getElementById('addNotebookBtn').addEventListener('click', addNotebook);
     document.getElementById('noteForm').addEventListener('submit', (event) => {
@@ -271,4 +310,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for changes in the database
     onValue(ref(database, 'notebooks'), displayNotebooks);
 });
-

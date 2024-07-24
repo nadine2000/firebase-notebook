@@ -18,10 +18,4 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const showToast = (message) => {
-  document.querySelector('#liveToast .toast-body').innerText = message;
-  const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-  toast.show();
-}
-
-export {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword, showToast };
+export {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword };

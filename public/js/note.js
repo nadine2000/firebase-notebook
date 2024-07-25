@@ -1,6 +1,17 @@
 import { getDatabase, ref, set, onValue, push, query, orderByChild, equalTo, get, remove, update }
     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
-import "./index.js"
+import {auth} from"./index.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+
+onAuthStateChanged(auth, (user) => {
+    console.log(user)
+    if (user) {
+        const uid = user.uid;
+    } else {
+        window.location.href = '/index.html';
+    }
+});
 
 const database = getDatabase();
 

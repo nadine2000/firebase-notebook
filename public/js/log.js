@@ -1,4 +1,6 @@
-import {db, auth, createUserWithEmailAndPassword, doc, setDoc, signInWithEmailAndPassword} from "./index.js"
+import {db, auth} from "./index.js"
+import { createUserWithEmailAndPassword,  signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const showToast = (message) => {
     document.querySelector('#liveToast .toast-body').innerText = message;
@@ -6,7 +8,7 @@ const showToast = (message) => {
     toast.show();
 }
 
-const Login = (event) => {
+const SignUp = (event) => {
       
     event.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
@@ -33,34 +35,28 @@ const Login = (event) => {
            });
        })
        .catch((error) => {
-        console.error('Error registering user:', error.code, error.message);
-        document.getElementById('error1').innerText = "Error: " + error.code.replace('auth/', '').replace('-', ' ');  
+        document.getElementById('error1').innerText = error.code.replace('auth/', '').replace('-', ' ') + error.message.replace(/\(.*?\)/g, '').replace('Firebase:', ' ');
        })
 }
   
-const SignUp = (event) => {
-      
+const Login = (event) => {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
   
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        localStorage.setItem('loggedInUserId', userCredential.user.uid);
-        window.location.href='home.html';})
+    .then(() => window.location.href='home.html')
     .catch((error) => {
-        console.error('Error registering user:', error.code);
         if (error.code === 'auth/invalid-credential') {
           document.getElementById('error2').innerText = "Incorrect Email or Password."
         }
         else {
-          document.getElementById('error2').innerText = "Error: " + error.code.replace('auth/', '').replace('-', ' ');  
+          document.getElementById('error2').innerText = "Error: " + error.code.replace('auth/', '');
         }
     })
-  
 }
   
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('submiti').addEventListener('click', (event) => SignUp(event));
-    document.getElementById('submits').addEventListener('click', (event) => Login(event));
+    document.getElementById('submits').addEventListener('submit', (event) => SignUp(event));
+    document.getElementById('submiti').addEventListener('submit', (event) => Login(event));
 });

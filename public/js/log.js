@@ -1,5 +1,5 @@
 import {db, auth} from "./index.js"
-import { createUserWithEmailAndPassword,  signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { createUserWithEmailAndPassword,  signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const showToast = (message) => {
@@ -18,25 +18,15 @@ const SignUp = (event) => {
   
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-           const user = userCredential.user;
-           const userData = {
-               email: email,
-               firstName: firstName,
-               lastName:lastName
-           };
-           showToast('Account Created Successfully');
-           const docRef = doc(db, "users", user.uid);
-           setDoc(docRef,userData)
-           .then(() => {
-               window.location.href= 'index.html';
-           })
-           .catch((error)=>{
-               console.error("error writing document: ", error);
-           });
-       })
-       .catch((error) => {
+        showToast('Account Created Successfully');
+        updateProfile(userCredential.user, {
+            displayName: firstName + ' ' + lastName,
+        }).then(() => window.location.href= 'index.html' )
+            .catch((error) => console.log(error))
+    })
+    .catch((error) => {
         document.getElementById('error1').innerText = error.code.replace('auth/', '').replace('-', ' ') + error.message.replace(/\(.*?\)/g, '').replace('Firebase:', ' ');
-       })
+    })
 }
   
 const Login = (event) => {

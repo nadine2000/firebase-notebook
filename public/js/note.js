@@ -1,58 +1,10 @@
-import { getDatabase, ref, set, onValue, push, query, orderByChild, equalTo, get, remove, update }
-    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
-import {auth} from"./index.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-
-onAuthStateChanged(auth, (user) => {
-    console.log(user)
-    if (user) {
-        const uid = user.uid;
-    } else {
-        window.location.href = '/index.html';
-    }
-});
+import { getDatabase, ref, set, onValue, push, get, remove, update } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
 
 const database = getDatabase();
 
-function toggle() {
-    const selectElement = document.getElementById('notebookSelect');
-    const selected = selectElement.options[selectElement.selectedIndex].text;
-    if (!(selected === null || selected === ''))
-    {
-        document.getElementById("one").classList.add('d-none');
-        document.getElementById("two").classList.remove('d-none');
-        document.getElementById('chosen').textContent = selected;
-    }
-}
-
-// Function to add a new notebook if the name doesn't already exist
-async function addNotebook() {
-    const title = document.getElementById('newNotebookName').value;
-    if (title) {
-        const notebooksRef = ref(database, 'notebooks');
-        const notebookQuery = query(notebooksRef, orderByChild('title'), equalTo(title));
-        try {
-            const snapshot = await get(notebookQuery);
-            if (!snapshot.exists()) {
-                const newNotebookRef = push(notebooksRef);
-                await set(newNotebookRef, { title: title, notes: [] });
-                document.getElementById('newNotebookName').value = '';
-                // Update the select element and set the new notebook as selected
-                updateNotebookSelect(newNotebookRef.key, title);
-                document.getElementById('notebookSelect').value = newNotebookRef.key; // Set the new notebook as selected
-                displayNotes(newNotebookRef.key); // Display notes for the new notebook
-            } else {
-                alert('A notebook with this title already exists.');
-            }
-        } catch (error) {
-            console.error('Error checking for existing notebooks:', error);
-        }
-    }
-}
-
 // Function to add a note to the selected notebook
-async function addNote() {
+async function addNote(event) {
+    event.preventDefault();
     const noteTitle = document.getElementById('noteTitle').value;
     const noteContent = document.getElementById('noteContent').value;
     const selectedNotebookId = document.getElementById('notebookSelect').value;
@@ -69,9 +21,7 @@ async function addNote() {
         // Clear the note form
         document.getElementById('noteForm').reset();
         displayNotes(selectedNotebookId); // Update the displayed notes
-        document.getElementById("one").classList.remove('d-none');
-        document.getElementById("two").classList.add('d-none');
-        
+        hideForm()
     } else {
         alert('Please fill in both note fields.');
     }
@@ -257,64 +207,10 @@ async function revertNoteVersion(notebookId, noteId, title, content) {
     }
 }
 
-// Function to update the notebook select element
-function updateNotebookSelect(notebookId, title) {
-    const notebookSelect = document.getElementById('notebookSelect');
-    const existingOption = notebookSelect.querySelector(`option[value="${notebookId}"]`);
-    if (!existingOption) {
-        const option = document.createElement('option');
-        option.value = notebookId;
-        option.textContent = title;
-        notebookSelect.appendChild(option);
-    }
+function hideForm(){
+    document.getElementById("one").classList.remove('d-none');
+    document.getElementById("two").classList.add('d-none');
 }
 
-// Function to display notebooks in the select element
-function displayNotebooks(snapshot) {
-    const notebookSelect = document.getElementById('notebookSelect');
-    const currentSelection = notebookSelect.value; // Store current selection
-    notebookSelect.innerHTML = ''; // Reset select options
+export {addNote , displayNotes, hideForm};
 
-    snapshot.forEach((childSnapshot) => {
-        const notebookId = childSnapshot.key;
-        const notebook = childSnapshot.val();
-        const option = document.createElement('option');
-        option.value = notebookId;
-        option.textContent = notebook.title;
-        notebookSelect.appendChild(option);
-    });
-
-    // Restore previous selection if it exists
-    if (currentSelection && notebookSelect.querySelector(`option[value="${currentSelection}"]`)) {
-        notebookSelect.value = currentSelection;
-        displayNotes(currentSelection); // Display notes for the current selection
-    } else {
-        // If the previous selection does not exist, select the first notebook
-        const firstOption = notebookSelect.querySelector('option');
-        if (firstOption) {
-            notebookSelect.value = firstOption.value;
-            displayNotes(firstOption.value);
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('toggleBtn').addEventListener('click', toggle);
-    document.getElementById('addNotebookBtn').addEventListener('click', addNotebook);
-    document.getElementById('noteForm').addEventListener('submit', (event) => {
-        event.preventDefault();
-        addNote();
-    });
-
-    document.getElementById('back').addEventListener('click', () => {
-        document.getElementById("one").classList.remove('d-none');
-        document.getElementById("two").classList.add('d-none');
-    });
-
-    document.getElementById('notebookSelect').addEventListener('change', (event) => {
-        displayNotes(event.target.value);
-    });
-
-    // Listen for changes in the database
-    onValue(ref(database, 'notebooks'), displayNotebooks);
-});

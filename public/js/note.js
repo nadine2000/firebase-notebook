@@ -108,16 +108,17 @@ async function saveNoteEdit(notebookId, noteId, oldTitle, oldContent) {
 
     try {
 
-        const noteSnapshot = await get(noteRef);
-        const note = noteSnapshot.val();
-        const versionHistory = note?.versionHistory || [];
-        versionHistory.push({ title: oldTitle, content: oldContent, timestamp: new Date().toISOString() });
-
-        await update(noteRef, {
-            title: newTitle,
-            content: newContent,
-            versionHistory: versionHistory
-        });
+        if (!(oldTitle === newTitle && oldContent === newContent)) {
+            const noteSnapshot = await get(noteRef);
+            const note = noteSnapshot.val();
+            const versionHistory = note?.versionHistory || [];
+            versionHistory.push({ title: oldTitle, content: oldContent, timestamp: new Date().toISOString() });
+            await update(noteRef, {
+                title: newTitle,
+                content: newContent,
+                versionHistory: versionHistory
+            });
+        }
         displayNotes(notebookId); // Update the displayed notes
     } catch (error) {
         console.error('Error saving edited note:', error);

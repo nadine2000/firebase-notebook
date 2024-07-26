@@ -81,14 +81,16 @@ async function deleteNote(notebookId, noteId) {
 function enterEditMode(noteCard, notebookId, noteId, title, content) {
     noteCard.innerHTML = `
           <div class="card-body">
-            <input type="text" class="form-control mb-2" value="${title}" id="editTitle-${noteId}">
-            <textarea class="form-control mb-2" rows="3" id="editContent-${noteId}">${content}</textarea>
-            <button class="btn btn-success save-note-btn" data-id="${noteId}">Save</button>
-            <button class="btn btn-secondary cancel-edit-btn" data-id="${noteId}">Cancel</button>
+          <form class="save-note-btn">
+            <input type="text" class="form-control mb-2" value="${title}" id="editTitle-${noteId}" required>
+            <textarea class="form-control mb-2" rows="3" id="editContent-${noteId}" required>${content}</textarea>
+            <button class="btn btn-success"  type="submit" data-id="${noteId}">Save</button>
+            <button class="btn btn-secondary cancel-edit-btn" type="button" data-id="${noteId}">Cancel</button>
+            </form>
           </div>
         `;
     // Add event listener for save button
-    noteCard.querySelector('.save-note-btn').addEventListener('click', () => {
+    noteCard.querySelector('.save-note-btn').addEventListener('submit', () => {
         saveNoteEdit(notebookId, noteId , title, content);
     });
     // Add event listener for cancel button

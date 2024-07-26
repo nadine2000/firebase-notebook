@@ -1,6 +1,5 @@
-import {db, auth} from "./index.js"
+import { auth } from "./index.js"
 import { createUserWithEmailAndPassword,  signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const showToast = (message) => {
     document.querySelector('#liveToast .toast-body').innerText = message;

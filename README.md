@@ -3,9 +3,9 @@
 
 <h1>Execution</h1>
 <p>
-The submission is a Webstorm project. To run the project please run these two commands on the webstorm terminal.
-  - npm install -g firebase-tools
-  - firebase serve --project fir-project-a57d5
+The submission is a Webstorm project. To run the project please run these two commands on the webstorm terminal.<br>
+  - npm install -g firebase-tools <br>
+  - firebase serve --project fir-project-a57d5 <br>
 after the second command you see the project on: http://localhost:5000/
 </p>
 <h1>Assumptions</h1>

@@ -3,7 +3,7 @@
 
 <h1>Execution</h1>
 
-The submission is a Webstorm project. To run the project please run these two commands on the webstorm terminal.\
+The submission is a Webstorm project. To run the project please run these two commands on the webstorm terminal.
   -  `npm install -g firebase-tools `
   -  `firebase serve --project fir-project-a57d5 ` 
 

@@ -8,11 +8,7 @@ A Simple Collaborative Note-Taking App allows multiple users to create, edit, an
 
 <h1>Execution</h1>
 
-The submission is a Webstorm project. To run the project please run these two commands on the webstorm terminal.
-  -  `npm install -g firebase-tools `
-  -  `firebase serve --project fir-project-a57d5 ` 
-
-then, Open [http://localhost:5000](http://localhost:5000) to view project in your browser.
+The submission is a Webstorm project. To run the project just open chrom.
 
 <h1>Assumptions</h1>
 <p>

@@ -8,7 +8,7 @@ A Simple Collaborative Note-Taking App allows multiple users to create, edit, an
 
 <h1>Execution</h1>
 
-The submission is a Webstorm project. To run the project just open chrom.
+The submission is a Webstorm project. To run the project just open index.html then, click on chrom icon.
 
 <h1>Assumptions</h1>
 <p>

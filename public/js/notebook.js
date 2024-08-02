@@ -9,7 +9,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('name').innerText = user?.displayName || '';
     } else {
-        window.location.href = '/index.html';
+        window.location.href = 'index.html';
     }
 });
 
